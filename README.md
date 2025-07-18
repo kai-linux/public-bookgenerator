@@ -7,7 +7,7 @@ Web application for AI book generation service based on React/Next.js framework.
 - **Frontend**: Professional React/Next.js interface with book configuration forms
 - **Backend**: Flask API with book generation endpoints and progress tracking
 - **Features**: Real-time progress updates, automatic DOCX file downloads, and error handling
-- **Deployment**: Fully deployed and accessible at https://3dhkilcjl1wd.manus.space
+- **Deployment**: Fully deployed and accessible at https://
 
 ## Architecture
 
