@@ -9,6 +9,15 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [...compat.extends("next/core-web-vitals")];
+const eslintConfig = [
+  ...compat.extends("next/core-web-vitals"),
+  {
+    settings: {
+      next: {
+        rootDir: "bookgenerator-frontend/",
+      },
+    },
+  },
+];
 
 export default eslintConfig;
