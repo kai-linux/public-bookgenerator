@@ -168,7 +168,7 @@
                 document.getElementById('progressState').classList.remove('hidden');
                 document.getElementById('errorState').classList.add('hidden');
                 
-                const response = await fetch('/api/book/generate', {
+                const response = await fetch('/api/story-generator/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
@@ -190,7 +190,7 @@
             if (!currentJobId) return;
             
             try {
-                const response = await fetch(`/api/book/status/${currentJobId}`);
+                const response = await fetch(`/api/story-generator/status/${currentJobId}`);
                 if (!response.ok) throw new Error('Failed to check status');
                 
                 const data = await response.json();
@@ -206,7 +206,7 @@
                     
                     // Trigger download
                     const link = document.createElement('a');
-                    link.href = `/api/book/download/${currentJobId}`;
+                    link.href = `/api/story-generator/download/${currentJobId}`;
                     link.download = `${document.getElementById('title').value.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.docx`;
                     document.body.appendChild(link);
                     link.click();
@@ -241,4 +241,3 @@
     </script>
 </body>
 </html>
-

@@ -9,7 +9,7 @@ from datetime import datetime
 import io
 import zipfile
 
-book_bp = Blueprint('book', __name__)
+story_generator_bp = Blueprint('story_generator', __name__)
 
 # In-memory storage for generation status (in production, use Redis or database)
 generation_status = {}
@@ -205,7 +205,7 @@ def simulate_book_generation(job_id, book_config):
             'created_at': datetime.now().isoformat()
         }
 
-@book_bp.route('/generate', methods=['POST'])
+@story_generator_bp.route('/generate', methods=['POST'])
 @cross_origin()
 def generate_book():
     """Start book generation process"""
@@ -241,7 +241,7 @@ def generate_book():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@book_bp.route('/status/<job_id>', methods=['GET'])
+@story_generator_bp.route('/status/<job_id>', methods=['GET'])
 @cross_origin()
 def get_generation_status(job_id):
     """Get generation status for a job"""
@@ -250,7 +250,7 @@ def get_generation_status(job_id):
     
     return jsonify(generation_status[job_id])
 
-@book_bp.route('/download/<job_id>', methods=['GET'])
+@story_generator_bp.route('/download/<job_id>', methods=['GET'])
 @cross_origin()
 def download_book(job_id):
     """Download generated book"""
@@ -271,9 +271,8 @@ def download_book(job_id):
         mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
     )
 
-@book_bp.route('/jobs', methods=['GET'])
+@story_generator_bp.route('/jobs', methods=['GET'])
 @cross_origin()
 def list_jobs():
     """List all generation jobs"""
     return jsonify(generation_status)
-

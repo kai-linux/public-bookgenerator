@@ -7,7 +7,7 @@ Web application for AI book generation service based on React/Next.js framework.
 - **Frontend**: Professional React/Next.js interface with book configuration forms
 - **Backend**: Flask API with book generation endpoints and progress tracking
 - **Features**: Real-time progress updates, automatic DOCX file downloads, and error handling
-- **Deployment**: Fully deployed and accessible at https://
+- **Deployment**: Ready to deploy to your preferred hosting platform
 
 ## Architecture
 
@@ -47,7 +47,7 @@ Web application for AI book generation service based on React/Next.js framework.
 
 ## API Endpoints
 
-### POST /api/book/generate
+### POST /api/story-generator/generate
 Start book generation process
 ```json
 {
@@ -59,7 +59,7 @@ Start book generation process
 }
 ```
 
-### GET /api/book/status/{job_id}
+### GET /api/story-generator/status/{job_id}
 Get generation status
 ```json
 {
@@ -70,10 +70,10 @@ Get generation status
 }
 ```
 
-### GET /api/book/download/{job_id}
+### GET /api/story-generator/download/{job_id}
 Download generated book (returns DOCX file)
 
-### GET /api/book/jobs
+### GET /api/story-generator/jobs
 List all generation jobs
 
 ### Local Development
@@ -81,6 +81,7 @@ List all generation jobs
    ```bash
    cd bookgenerator-backend
    source venv/bin/activate
+   export SECRET_KEY=replace-with-a-random-secret
    python src/main.py
    ```
 
@@ -118,7 +119,7 @@ bookgenerator-backend/
 ├── src/
 │   ├── main.py              # Flask application entry point
 │   ├── routes/
-│   │   ├── book.py          # Book generation endpoints
+│   │   ├── story_generator.py # Story generation endpoints
 │   │   └── user.py          # User management (template)
 │   ├── models/
 │   │   └── user.py          # Database models (template)
@@ -182,4 +183,3 @@ bookgenerator/              # Original Next.js frontend
 - ✅ Receive book as automatic DOCX download
 - ✅ Professional, responsive interface
 - ✅ Deployed and publicly accessible
-

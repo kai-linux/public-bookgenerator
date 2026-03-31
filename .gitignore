@@ -42,3 +42,10 @@ next-env.d.ts
 
 *.docx
 bookgenerator-frontend/node_modules
+
+# python
+__pycache__/
+*.py[cod]
+
+# local backend state
+bookgenerator-backend/src/database/*.db

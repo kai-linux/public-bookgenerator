@@ -34,7 +34,7 @@ export default function Home() {
     setStatusMessage('Starting book generation...');
 
     try {
-      const response = await fetch('/api/book/generate', {
+      const response = await fetch('/api/story-generator/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export default function Home() {
     if (!jobId) return;
 
     try {
-      const response = await fetch(`/api/book/status/${jobId}`);
+      const response = await fetch(`/api/story-generator/status/${jobId}`);
       if (!response.ok) {
         throw new Error('Failed to check status');
       }
@@ -71,7 +71,7 @@ export default function Home() {
       if (data.status === 'completed') {
         setIsGenerating(false);
         // Trigger download
-        const downloadUrl = `/api/book/download/${jobId}`;
+        const downloadUrl = `/api/story-generator/download/${jobId}`;
         const link = document.createElement('a');
         link.href = downloadUrl;
         link.download = `${bookConfig.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.docx`;

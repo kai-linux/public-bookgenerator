@@ -7,19 +7,19 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 from src.models.user import db
 from src.routes.user import user_bp
-from src.routes.book import book_bp
+from src.routes.story_generator import story_generator_bp
 
 db_dir = os.path.join(os.path.dirname(__file__), 'database')
 os.makedirs(db_dir, exist_ok=True)  # Create directory if it doesn't exist
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = 'REDACTED_SECRET_KEY'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-me')
 
 # Enable CORS for all routes
 CORS(app)
 
 app.register_blueprint(user_bp, url_prefix='/api')
-app.register_blueprint(book_bp, url_prefix='/api/book')
+app.register_blueprint(story_generator_bp, url_prefix='/api/story-generator')
 
 # uncomment if you need to use database
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(db_dir, 'app.db')}"
