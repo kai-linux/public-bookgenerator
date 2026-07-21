@@ -1,185 +1,131 @@
-# AI Book Generator - Complete Web Application
+# WriteAIBook — OpenAI Build Week 2026
 
-## Overview
+**One premise in. One connected, editable manuscript out.**
 
-Web application for AI book generation service based on React/Next.js framework. The application includes:
+WriteAIBook plans a book before drafting it, generates Pro prose with
+GPT-5.6 Terra, and preserves the same manuscript, story bible, and chapter plan
+when the author continues.
 
-- **Frontend**: Professional React/Next.js interface with book configuration forms
-- **Backend**: Flask API with book generation endpoints and progress tracking
-- **Features**: Real-time progress updates, automatic DOCX file downloads, and error handling
-- **Deployment**: Ready to deploy to your preferred hosting platform
+- **Live product:** https://writeaibook.com/generate
+- **Demo video:** https://youtu.be/0Al1nSh4wNQ
+- **Build Week track:** Apps for Your Life
 
-## Architecture
+## Why this public repository exists
 
-### Frontend (React/Next.js)
-- Built on  existing Next.js structure
-- Professional UI with Tailwind CSS styling
-- Real-time progress tracking with polling
-- Automatic file download functionality
-- Responsive design for desktop and mobile
+WriteAIBook is an established production product and its deployment repository
+is private. This repository is the public, sanitized code submission for OpenAI
+Build Week. It contains dependency-trimmed extracts of the qualifying production
+contracts and executable tests, without customer data, credentials, operational
+configuration, billing secrets, private analytics, or unrelated business code.
 
-### Backend (Flask)
-- RESTful API with CORS enabled
-- Background job processing with threading
-- In-memory status tracking (can be upgraded to Redis/database)
-- Custom DOCX generation without external dependencies
-- File storage and download endpoints
+The product predates Build Week. Judges should evaluate the extension built
+after **July 13, 2026 at 9:00 AM PDT**, summarized in
+[`BUILD_WEEK_EVIDENCE.md`](BUILD_WEEK_EVIDENCE.md).
 
-## Features Implemented
+## What was built during Build Week
 
-### 1. Book Configuration Interface
-- **Title**: Required field for book title
-- **Author**: Optional author name
-- **Genre**: Fiction, Non-Fiction, Mystery, Romance, Sci-Fi, Fantasy
-- **Chapters**: 1-20 chapters (default: 5)
+1. **GPT-5.6 Terra Pro generation** through the official OpenAI API.
+2. **Same-model failover:** if the official route is unavailable, OpenRouter
+   serves GPT-5.6 Terra rather than silently downgrading the Pro tier.
+3. **Capability-aware requests:** Terra-incompatible legacy sampling controls
+   are removed before the request instead of causing predictable HTTP 400s.
+4. **Durable generation state:** closing the page does not kill the manuscript.
+5. **Connected continuation:** the existing chapters, premise, story bible,
+   genre, language, and quality tier remain attached to the same book.
+6. **Delta-only billing:** continuation charges only for chapters that have not
+   already been generated.
+7. **Bounded recovery and strict safety boundaries:** a small quality miss may
+   preserve clean prose; refusals, unsafe output, provider exhaustion, and
+   unusable artifacts still stop hard.
+8. **Per-book feedback** tied to the exact completed artifact.
 
-### 2. Generation Process
-- **Real-time Progress**: Updates every 2 seconds
-- **Status Messages**: Detailed progress information
-- **Background Processing**: Non-blocking generation
-- **Error Handling**: Comprehensive error states and user feedback
+## How GPT-5.6 Terra is used
 
-### 3. File Download
-- **Automatic Download**: Triggers when generation completes
-- **DOCX Format**: Professional Word document format
-- **Custom Naming**: Based on book title
-- **File Persistence**: Temporary storage for download
+The production Pro provider chain is deliberately narrow:
 
-## API Endpoints
-
-### POST /api/story-generator/generate
-Start book generation process
-```json
-{
-  "title": "Book Title",
-  "author": "Author Name",
-  "genre": "fiction",
-  "chapters": 5,
-  "length": "medium"
-}
+```text
+official OpenAI API / gpt-5.6-terra
+                    ↓ failover
+OpenRouter / openai/gpt-5.6-terra
 ```
 
-### GET /api/story-generator/status/{job_id}
-Get generation status
-```json
-{
-  "status": "processing",
-  "progress": 60,
-  "message": "Writing introduction and conclusion...",
-  "created_at": "2025-07-18T18:30:00"
-}
+The fallback preserves the model family and the user-facing quality promise.
+The reference implementation in
+[`build_week_reference/provider_contract.py`](build_week_reference/provider_contract.py)
+shows the model identifiers, provider ordering, capability-aware request body,
+and same-model invariant.
+
+GPT-5.6 Terra receives the book plan, story bible, canon, chapter position, and
+prose instructions. It is not used as a stateless “write the next paragraph”
+chat. Every chapter is generated as part of one durable book artifact.
+
+## How Codex was used
+
+Codex was the primary engineering collaborator for the qualifying work. The
+primary session ID was:
+
+```text
+019f5cdb-d63e-7ff2-9165-41e8f12a763f
 ```
 
-### GET /api/story-generator/download/{job_id}
-Download generated book (returns DOCX file)
+Codex helped to:
 
-### GET /api/story-generator/jobs
-List all generation jobs
+- map the existing asynchronous generation pipeline;
+- implement the GPT-5.6 Terra provider transition;
+- identify unsupported request parameters and turn the failure into a
+  capability check;
+- propagate continuation invariants through persistence, billing, API state,
+  and browser UI;
+- reproduce authentication, progress-polling, and checkout races;
+- convert production failures into deterministic regression tests;
+- review the eligible scope and verify the complete browser journey.
 
-### Local Development
-1. **Backend Setup**:
-   ```bash
-   cd bookgenerator-backend
-   source venv/bin/activate
-   export SECRET_KEY=replace-with-a-random-secret
-   python src/main.py
-   ```
+The product decisions remained human-owned: no hidden quality downgrade,
+same-model failover, delta-only continuation billing, bounded quality recovery,
+and hard safety stops. Codex helped carry those decisions consistently through
+the stack.
 
-2. **Frontend Setup**:
-   ```bash
-   cd bookgenerator
-   npm install
-   npm run dev
-   ```
+## Public reference implementation
 
-## Technical Implementation Details
-
-### Custom DOCX Generation
-- Implemented custom DOCX creation using ZIP and XML
-- No external dependencies (removed python-docx due to deployment issues)
-- Proper Word document structure with formatting
-- Supports titles, authors, chapters, and paragraphs
-
-### Progress Tracking
-- Background threading for non-blocking generation
-- In-memory status storage with job IDs
-- Real-time updates via polling
-- Automatic cleanup and file management
-
-### Error Handling
-- Comprehensive try-catch blocks
-- User-friendly error messages
-- Graceful degradation
-- Status recovery mechanisms
-
-## File Structure
-
-```
-bookgenerator-backend/
-├── src/
-│   ├── main.py              # Flask application entry point
-│   ├── routes/
-│   │   ├── story_generator.py # Story generation endpoints
-│   │   └── user.py          # User management (template)
-│   ├── models/
-│   │   └── user.py          # Database models (template)
-│   └── static/
-│       └── index.html       # Frontend application
-├── requirements.txt         # Python dependencies
-└── venv/                   # Virtual environment
-
-bookgenerator/              # Original Next.js frontend
-├── app/
-│   ├── page.js             # Enhanced main page component
-│   ├── layout.js           # Application layout
-│   └── api/
-│       └── auth/
-│           └── route.js    # API route (template)
-├── next.config.mjs         # Next.js configuration with proxy
-└── package.json           # Node.js dependencies
+```text
+build_week_reference/
+├── provider_contract.py       # Terra routing and request capabilities
+└── continuation_contract.py   # durable canon, delta billing, recovery rules
+tests/
+└── test_build_week_reference.py
 ```
 
-## Usage Instructions
+Run the self-contained tests with Python 3.12 or newer:
 
-### For End Users
-1. Visit homepage
-2. Fill in book configuration:
-   - Enter a book title (required)
-   - Add author name (optional)
-   - Select genre and preferences
-3. Click "Generate Book"
-4. Monitor real-time progress
-5. Book will automatically download when complete
+```bash
+python -m unittest discover -s tests -v
+```
 
-### For Developers
-1. Clone the repository
-2. Set up backend environment
-3. Install dependencies
-4. Run local development servers
-5. Customize book generation logic as needed
+No API key, paid service, database, or production access is required.
 
-## Future Enhancements
+## Architecture of the production product
 
-### Recommended Improvements
-1. **AI Integration**: Replace mock generation with actual AI service
-2. **Database**: Implement persistent storage for jobs and files
-3. **Authentication**: Add user accounts and book history
-4. **Templates**: Multiple book templates and styles
-5. **Export Options**: PDF, EPUB, and other formats
-6. **Advanced Configuration**: More detailed customization options
+- Python 3.12 and Quart
+- SQLAlchemy with durable generation metadata
+- Vanilla JavaScript generation interface
+- Server-side asynchronous generation jobs
+- OpenAI API with same-model OpenRouter fallback
+- Editable DOCX artifacts in S3-compatible storage
+- Stripe credit billing
+- Pytest unit and integration tests
+- Playwright browser journeys
 
-### Scalability Considerations
-1. **Redis**: For distributed job tracking
-2. **File Storage**: Cloud storage for generated files
-3. **Queue System**: Celery or similar for background jobs
-4. **Load Balancing**: Multiple backend instances
-5. **CDN**: Static asset delivery optimization
+## Repository history note
 
-## Conclusion
+The `bookgenerator-backend/` and `bookgenerator-frontend/` directories are an
+older public prototype retained for historical transparency. They are **not**
+the current production application and should not be used to evaluate the Build
+Week implementation. The root documentation and `build_week_reference/` contain
+the current submission materials.
 
-- ✅ User can configure book settings
-- ✅ Request generation from backend
-- ✅ Wait with real-time progress tracking
-- ✅ Receive book as automatic DOCX download
-- ✅ Professional, responsive interface
-- ✅ Deployed and publicly accessible
+## Privacy and security
+
+This public snapshot intentionally excludes `.env` files, credentials, private
+deployment scripts, customer information, generated customer books, internal
+analytics, and payment configuration. No access to the private production
+repository is required to review or run the code published here.
